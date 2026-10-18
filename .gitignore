@@ -69,3 +69,6 @@ Testing/
 
 # Local datasets
 data/
+
+# Local VS Code configuration
+.vscode/

@@ -12,7 +12,13 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 # Create the executable
-add_executable(VisualOdometry main.cpp)
+add_executable(VisualOdometry
+    main.cpp
+    src/DataFileHandler.cpp
+    src/Calibration.cpp
+)
+
+target_include_directories(VisualOdometry PRIVATE src)
 
 # Link OpenCV libraries to the executable
 target_link_libraries(VisualOdometry ${OpenCV_LIBS})

@@ -14,7 +14,7 @@
 using namespace cv;
 using namespace std;
 
-int getSequenceID(const char* arg)
+int getSequenceIDArg(const char* arg)
 {
     if (arg == nullptr || *arg == '\0') {
         throw invalid_argument("Sequence ID cannot be empty");
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
         cout << "Sequence ID not provided, falling back to sequence ID = 00" << endl;
     } else {
         try {
-            sequenceID = getSequenceID(argv[1]);
+            sequenceID = getSequenceIDArg(argv[1]);
         } catch (const invalid_argument& error) {
             cerr << "Invalid sequence ID: " << error.what() << endl;
             return 1;

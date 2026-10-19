@@ -1,6 +1,18 @@
 # Visual Odometry
 
-A C++ project using OpenCV and CMake.
+A C++17 visual-odometry project using OpenCV and CMake. It implements a
+traditional, deterministic computer-vision pipeline that estimates a vehicle's
+relative motion and cumulative 3D trajectory from a sequence of images
+captured by a single calibrated camera.
+
+The system uses visual feature detection and tracking, optical flow, RANSAC
+outlier rejection, epipolar geometry, and essential-matrix decomposition to
+recover camera rotation and translation without relying on GPS. These
+techniques are relevant to autonomous flight, terrain-referenced navigation,
+visual dead reckoning, Visual SLAM, and planetary rover navigation.
+
+The program accepts a KITTI sequence ID from `00` through `21`. If no sequence
+ID is provided, it defaults to sequence `00`.
 
 ## Prerequisites
 
@@ -15,9 +27,71 @@ possible setup. Make sure the compiler, CMake, and OpenCV installation are
 available on `PATH`, or provide OpenCV's CMake package directory explicitly
 when configuring the project.
 
-The local `data/` directory contains the dataset used for development. It is
-intentionally excluded from Git because of its size and must be obtained
-separately.
+## Dataset
+
+This project uses the [KITTI Vision Benchmark Suite Odometry
+dataset](https://www.cvlibs.net/datasets/kitti/eval_odometry.php). The
+following two downloads are needed:
+
+- [Download odometry data set (grayscale, 22 GB)](https://s3.eu-central-1.amazonaws.com/avg-kitti/data_odometry_gray.zip)
+  - Contains the grayscale image sequences and their calibration files.
+- [Download odometry ground truth poses (4 MB)](https://s3.eu-central-1.amazonaws.com/avg-kitti/data_odometry_poses.zip)
+  - Contains the ground-truth pose files used for evaluation.
+
+The dataset is intentionally excluded from Git because of its size. To install
+it:
+
+1. Download both ZIP files.
+2. Extract the grayscale archive.
+3. Extract the ground-truth poses archive.
+4. Create a `data` directory in the project root.
+5. Copy or move the extracted `sequences` directory into `data`.
+6. Copy or move the extracted `poses` directory into `data`.
+
+The project should have this structure:
+
+```text
+VisualOdometry/
+├── CMakeLists.txt
+├── README.md
+├── main.cpp
+├── src/
+└── data/
+    ├── poses/
+    │   ├── 00.txt
+    │   ├── 01.txt
+    │   └── ...
+    └── sequences/
+        ├── 00/
+        │   ├── calib.txt
+        │   ├── times.txt
+        │   ├── image_0/
+        │   │   ├── 000000.png
+        │   │   ├── 000001.png
+        │   │   └── ...
+        │   └── image_1/
+        │       ├── 000000.png
+        │       └── ...
+        ├── 01/
+        └── ...
+```
+
+The paths must be directly under `data/`. For example, the calibration file
+for sequence `00` must be located at:
+
+```text
+data/sequences/00/calib.txt
+```
+
+and the left-camera images must be located at:
+
+```text
+data/sequences/00/image_0/
+```
+
+Do not leave an extra archive directory level such as
+`data/data_odometry_gray/sequences/00/`; the application expects
+`data/sequences/00/` directly.
 
 ## Build from a terminal
 
@@ -55,13 +129,20 @@ VS Code is optional; the project can be built entirely from the terminal.
 
 Personal VS Code settings, tasks, and launch configurations are intentionally
 not committed. Each developer can create the configuration appropriate for
-their operating system, compiler, and debugger.
+their operating system and debugger.
 
 ## Run
 
-The current sample program reads `test.jpg` from the working directory and
-opens it in an OpenCV window:
+Run from the project root so the application can resolve the `data/` directory:
 
 ```powershell
-.\build\VisualOdometry.exe
+.\build\VisualOdometry.exe 00
 ```
+
+The sequence argument is optional. For example, to use sequence `05`:
+
+```powershell
+.\build\VisualOdometry.exe 05
+```
+
+If no argument is provided, sequence `00` is used.

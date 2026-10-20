@@ -112,8 +112,7 @@ int main(int argc, char** argv)
 
         // Visual Odometry Pipeline
         // Loop through all consecutive image pairs
-        // TODO: Switch back to image count
-        for (int i = 0; i + 1 < 50; i++) {
+        for (int i = 0; i + 1 < numImages; i++) {
             // 1. Read image 2 (i + 1)
             // Format into a string of 6 digits filled with zeros
             const std::filesystem::path img2FilePath =
@@ -121,6 +120,8 @@ int main(int argc, char** argv)
 
             // 2. Lucas Kanade with img 1 and img 2 (i and i+1)
             const int originalPointCount = static_cast<int>(img1Points.size());
+            
+            // Points that LucasKanade was able to track
             std::vector<cv::Point2f> trackedImg1Points;
             std::vector<cv::Point2f> trackedImg2Points;
             if (!visualOdometry.trackPointsLucasKanade(
@@ -142,6 +143,8 @@ int main(int argc, char** argv)
 
             // 3. Find essential mat, Outlier filtering with RANSAC
             cv::Mat essentialMatrix;
+
+            // Points that survived RANSAC filtering
             std::vector<cv::Point2f> img1InlierPoints;
             std::vector<cv::Point2f> img2InlierPoints;
             if (!visualOdometry.findEssentialMatrix(

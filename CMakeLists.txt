@@ -16,6 +16,8 @@ add_executable(VisualOdometry
     main.cpp
     src/DataFileHandler.cpp
     src/Calibration.cpp
+    src/VisualOdometry.cpp
+    src/TrajectoryDrawer.cpp
 )
 
 target_include_directories(VisualOdometry PRIVATE src)

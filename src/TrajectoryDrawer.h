@@ -7,6 +7,8 @@ class TrajectoryDrawer {
 private:
     std::string windowName;
     cv::Size windowSize;
+    cv::Size trajectorySize;
+    cv::Mat trajectory;
     cv::Point trajectoryOrigin;
     double trajectoryScale;
     cv::Scalar estimatedTrajectoryColor;
@@ -14,10 +16,17 @@ private:
     int trajectoryLineThickness;
     int displayDelayMilliseconds;
 
+    static cv::Point toTrajectoryPoint(
+        const cv::Point& origin,
+        double scale,
+        const cv::Mat& position
+    );
+
 public:
     TrajectoryDrawer(
         const std::string& windowName,
         const cv::Size& windowSize,
+        const cv::Size& trajectorySize,
         const cv::Point& trajectoryOrigin,
         double trajectoryScale,
         const cv::Scalar& estimatedTrajectoryColor,
@@ -27,16 +36,14 @@ public:
     );
 
     void drawEstimatedTrajectory(
-        const cv::Mat& trajectory,
         const cv::Mat& previousPosition,
         const cv::Mat& currentPosition
-    ) const;
+    );
 
     void drawGroundTruthTrajectory(
-        const cv::Mat& trajectory,
         const cv::Mat& previousPose,
         const cv::Mat& currentPose
-    ) const;
+    );
 
-    void show(const cv::Mat& trajectory) const;
+    void show() const;
 };

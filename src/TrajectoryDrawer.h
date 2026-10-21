@@ -19,6 +19,7 @@ private:
     double trajectoryScale;
     cv::Scalar estimatedTrajectoryColor;
     cv::Scalar groundTruthTrajectoryColor;
+    bool hasGroundTruthTrajectory;
     std::vector<TrajectorySegment> segments;
     double minX;
     double maxX;
@@ -36,6 +37,7 @@ private:
     );
     void updateBounds(const cv::Point3d& position);
     void redraw();
+    void drawLegend();
 
 public:
     TrajectoryDrawer(
@@ -56,6 +58,11 @@ public:
     void drawGroundTruthTrajectory(
         const cv::Mat& previousPose,
         const cv::Mat& currentPose
+    );
+
+    void drawCoordinates(
+        const cv::Mat& estimatedPosition,
+        const cv::Mat* groundTruthPose = nullptr
     );
 
     void show() const;

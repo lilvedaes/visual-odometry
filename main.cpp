@@ -85,6 +85,9 @@ int main(int argc, char** argv)
             2,
             1
         );
+        const std::string imageWindowName = "Current Image";
+        cv::namedWindow(imageWindowName, cv::WINDOW_NORMAL);
+        cv::resizeWindow(imageWindowName, 800, 600);
 
         // Global cumulative R and t
         cv::Mat R_f = cv::Mat::eye(3, 3, CV_64F);
@@ -115,6 +118,14 @@ int main(int argc, char** argv)
             // Format into a string of 6 digits filled with zeros
             const std::filesystem::path img2FilePath =
                 dataFileHandler.getImageFilePathByImageIndex(imageFolderPath, i + 1);
+            const cv::Mat currentImage = cv::imread(
+                img2FilePath.string(),
+                cv::IMREAD_GRAYSCALE
+            );
+            if (currentImage.empty()) {
+                throw std::runtime_error(
+                    "Could not read image: " + img2FilePath.string());
+            }
 
             // 2. Lucas Kanade with img 1 and img 2 (i and i+1)
             const int originalPointCount = static_cast<int>(img1Points.size());
@@ -226,6 +237,11 @@ int main(int argc, char** argv)
                     img2GroundTruthPose
                 );
             }
+            trajectoryDrawer.drawCoordinates(
+                t_f,
+                hasGroundTruthPoses ? &img2GroundTruthPose : nullptr
+            );
+            cv::imshow(imageWindowName, currentImage);
             trajectoryDrawer.show();
 
             // 9. Reset

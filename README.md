@@ -14,6 +14,10 @@ visual dead reckoning, Visual SLAM, and planetary rover navigation.
 The program accepts a KITTI sequence ID from `00` through `21`. If no sequence
 ID is provided, it defaults to sequence `00`.
 
+Sequences `00` through `10` include public ground-truth poses. Sequences `11`
+through `21` do not, so their trajectories are estimated with unknown scale
+and are shown without a ground-truth comparison.
+
 ## Prerequisites
 
 Install the following tools:
@@ -146,3 +150,35 @@ The sequence argument is optional. For example, to use sequence `05`:
 ```
 
 If no argument is provided, sequence `00` is used.
+
+## Visualization
+
+The program opens two resizeable windows while it runs:
+
+- **Trajectory** shows the estimated trajectory in red and the ground-truth
+  trajectory in green when it is available. It also shows the current
+  coordinates for each line.
+- **Current Image** shows the current KITTI image in color.
+
+The trajectory view automatically rescales as new positions are added. This
+keeps the display useful for both short and long sequences, including
+sequences without ground truth.
+
+## Possible improvements
+
+The accuracy could be improved by using a stronger feature detector and
+descriptor, such as ORB or SIFT, instead of relying only on FAST features.
+Better feature matching, adaptive RANSAC thresholds, and rejecting frames with
+too few reliable tracks would make the pose estimates more stable.
+
+The current approach estimates motion one frame at a time, so small errors
+accumulate into drift. Keyframe selection, local bundle adjustment, loop
+closure, and pose-graph optimization could reduce that drift. Stereo images or
+an IMU would also provide more reliable depth and scale, especially for
+sequences `11` through `21`.
+
+For better efficiency, images could be loaded and processed in worker threads
+while the visualization runs separately. Image buffers could be reused,
+feature detection could be limited to a region of interest, and the number of
+tracked features could be capped. Drawing and coordinate updates could also
+run less often than the motion-estimation loop.

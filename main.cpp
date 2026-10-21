@@ -80,8 +80,6 @@ int main(int argc, char** argv)
             "Trajectory",
             cv::Size(800, 800),
             cv::Size(800, 800),
-            cv::Point(400, 400),
-            50.0,
             cv::Scalar(0, 0, 255),
             cv::Scalar(0, 255, 0),
             2,
@@ -201,12 +199,13 @@ int main(int argc, char** argv)
             // 6. Accumulate trajectory in global transformation matrix
             const cv::Mat previousEstimatedPosition = t_f.clone();
 
-            // a. Rotate that vector so it aligns with the drone's current global orientation (R_f * t)
-            // b. Add it to the drone's current global position (t_f)
-            t_f = t_f + (R_f * t);
+            // a. Convert recover pose output to camera-center displacement (-R.t() * t)
+            // b. Rotate that vector so it aligns with the drone's current global orientation (R_f * )
+            // c. Add it to the drone's current global position (t_f +)
+            t_f = t_f + (R_f * (-R.t() * t));
 
             // Update the drone's global rotation
-            R_f = R * R_f;
+            R_f = R_f * R.t();
 
             // 7. Check threshold to recalculate FAST
             std::vector<cv::Point2f> nextPoints = img2InlierPoints;

@@ -77,7 +77,7 @@ bool VisualOdometry::findEssentialMatrix(
 ) const
 {
     if (previousPoints.size() != currentPoints.size()
-        || previousPoints.size() < 5
+        || previousPoints.size() < 8
         || cameraMatrix.empty()) {
         return false;
     }
@@ -93,7 +93,10 @@ bool VisualOdometry::findEssentialMatrix(
         1000,
         inlierMask
     );
-    if (essentialMatrix.empty() || inlierMask.empty()) {
+    if (essentialMatrix.empty()
+        || essentialMatrix.rows != 3
+        || essentialMatrix.cols != 3
+        || inlierMask.empty()) {
         return false;
     }
 
@@ -127,7 +130,7 @@ bool VisualOdometry::recoverCameraPose(
 {
     if (essentialMatrix.empty()
         || previousPoints.size() != currentPoints.size()
-        || previousPoints.size() < 5
+        || previousPoints.size() < 8
         || cameraMatrix.empty()) {
         return false;
     }
@@ -141,9 +144,13 @@ bool VisualOdometry::recoverCameraPose(
         translation
     );
 
-    return inlierCount >= 5
+    return inlierCount >= 8
         && !rotation.empty()
-        && !translation.empty();
+        && !translation.empty()
+        && rotation.rows == 3
+        && rotation.cols == 3
+        && translation.rows == 3
+        && translation.cols == 1;
 }
 
 double VisualOdometry::calculateScaleFromPoses(

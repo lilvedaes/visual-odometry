@@ -18,6 +18,10 @@ Sequences `00` through `10` include public ground-truth poses. Sequences `11`
 through `21` do not, so their trajectories are estimated with unknown scale
 and are shown without a ground-truth comparison.
 
+## Demo
+
+Demo video: [link](https://youtu.be/WUtpXuegWn0)
+
 ## Prerequisites
 
 Install the following tools:
@@ -182,3 +186,38 @@ while the visualization runs separately. Image buffers could be reused,
 feature detection could be limited to a region of interest, and the number of
 tracked features could be capped. Drawing and coordinate updates could also
 run less often than the motion-estimation loop.
+
+Some of these problems can already be seen in the demo video. The estimated
+trajectory can drift away from the ground truth, and poor feature tracks can
+make the motion estimate less stable. These are expected limitations of this
+simple frame-by-frame monocular approach and are the main areas that could be
+improved.
+
+## Theory and sources
+
+The pipeline follows the basic structure of a traditional monocular visual
+odometry system:
+
+1. FAST detects image corners that are suitable for tracking.
+2. Lucas-Kanade optical flow follows those points into the next frame.
+3. RANSAC removes mismatched or unreliable point tracks.
+4. The essential matrix describes the epipolar relationship between the two
+   calibrated camera views.
+5. Pose recovery decomposes that relationship into relative rotation and
+   translation.
+6. The relative motion is accumulated to estimate the camera trajectory.
+
+Although this is called monocular visual odometry, the two views come from the
+same camera at different times. A single camera cannot determine absolute
+scale on its own, which is why scale is estimated from KITTI poses for
+sequences `00` through `10`. Sequences `11` through `21` have no public poses,
+so their trajectories have unknown scale.
+
+Useful references:
+
+- [Monocular Visual Odometry using OpenCV](https://avisingh599.github.io/vision/monocular-vo/)
+- [FAST corner detection](https://www.youtube.com/watch?v=zJUiZUNKhCI)
+- [Lucas-Kanade optical flow](https://www.youtube.com/watch?v=6wMoHgpVUn8)
+- [Epipolar geometry and the essential matrix](https://www.youtube.com/watch?v=cLeF-KNHgwU)
+- [RANSAC](https://www.youtube.com/watch?v=9D5rrtCC_E0)
+- [Pose estimation from the essential matrix](https://avisingh599.github.io/vision/monocular-vo/#pose-estimation-from-the-essential-matrix)
